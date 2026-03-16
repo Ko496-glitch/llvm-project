@@ -2792,7 +2792,7 @@ CIRGenFunction::emitAArch64BuiltinExpr(unsigned builtinID, const CallExpr *expr,
       ops[1] = builder.getSInt64(apsInt->getZExtValue(), loc);
 
       const StringRef intrinsicName = "aarch64.neon.sqshlu";
-      return emitNeonCall(builder, {intType, intType}, ops, intrinsicName, intType, loc);
+      return emitNeonCall(builder, {intType, intType}, ops, intrinsicName, intType, loc,false,0,false);
   }
   case NEON::BI__builtin_neon_vqshld_n_u64:
   case NEON::BI__builtin_neon_vqshld_n_s64: {
@@ -2806,7 +2806,7 @@ CIRGenFunction::emitAArch64BuiltinExpr(unsigned builtinID, const CallExpr *expr,
       ops.push_back(emitScalarExpr(expr->getArg(1)));
       ops[1] = builder.createIntCast(ops[1], intType);
 
-      return emitNeonCall(builder, {intType, intType}, ops, intrinsicName, intType, loc);
+      return emitNeonCall(builder, {intType, intType}, ops, intrinsicName, intType, loc,false,0,false);
   }
   case NEON::BI__builtin_neon_vrshrd_n_u64:
   case NEON::BI__builtin_neon_vrshrd_n_s64:
