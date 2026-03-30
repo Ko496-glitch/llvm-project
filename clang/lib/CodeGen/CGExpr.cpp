@@ -2757,7 +2757,7 @@ void CodeGenFunction::EmitStoreThroughLValue(RValue Src, LValue Dst,
         Vec = Builder.CreateBitCast(Vec, IRVecTy);
         // iN --> <N x i1>.
 
-        if(SrcVal->getType() != Builder.getInt1Ty()){
+        if(SrcVal->getType() != Builder.getInt1Ty())
             SrcVal = Builder.CreateTrunc(SrcVal,Builder.getInt1Ty());
         }
       }
