@@ -6104,6 +6104,41 @@ KnownFPClass SelectionDAG::computeKnownFPClass(SDValue Op,
     Known.fabs();
     break;
   }
+  case ISD::FMAXNUM:
+  case ISD::FMINNUM:
+  case ISD::FMAXIMUM:
+  case ISD::FMINIMUM:
+  case ISD::FMAXIMUMNUM:
+  case ISD::FMINIMUMNUM: {
+    KnownFPClass KnownLHS = computeKnownFPClass(Op.getOperand(0), DemandedElts,
+                                                InterestedClasses, Depth + 1);
+    KnownFPClass KnownRHS = computeKnownFPClass(Op.getOperand(1), DemandedElts,
+                                                InterestedClasses, Depth + 1);
+
+    auto Kind = [Opcode]() {
+      switch (Opcode) {
+      case ISD::FMAXNUM:
+        return KnownFPClass::MinMaxKind::maxnum;
+      case ISD::FMINNUM:
+        return KnownFPClass::MinMaxKind::minnum;
+      case ISD::FMAXIMUM:
+        return KnownFPClass::MinMaxKind::maximum;
+      case ISD::FMINIMUM:
+        return KnownFPClass::MinMaxKind::minimum;
+      case ISD::FMAXIMUMNUM:
+        return KnownFPClass::MinMaxKind::maximumnum;
+      case ISD::FMINIMUMNUM:
+        return KnownFPClass::MinMaxKind::minimumnum;
+      default:
+        llvm_unreachable("Illegal FP min/max opcode");
+      }
+    }();
+
+    DenormalMode Mode = getDenormalMode(VT);
+    Known = KnownFPClass::minMaxLike(KnownLHS, KnownRHS, Kind, Mode);
+    break;
+  }
+
   default:
     if (Opcode >= ISD::BUILTIN_OP_END || Opcode == ISD::INTRINSIC_WO_CHAIN ||
         Opcode == ISD::INTRINSIC_W_CHAIN || Opcode == ISD::INTRINSIC_VOID) {
